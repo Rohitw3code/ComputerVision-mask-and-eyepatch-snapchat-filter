@@ -88,21 +88,25 @@ class SnapFilter():
         self.maskColor = maskcolor
         self.eyePatchColor = eyePatchColor
 
-    def drawLips(self, img, coodinates, thickness=1, color=(0, 0, 255), innerColor=(0, 0, 0)):
+    def drawLips(self, img, coodinates, thickness=1, color=(0, 0, 255), innerLineColor=(0, 0, 0),outerLineColor=(0,0,0),alpha = 0.4):
+        outerLips = [57, 185, 40, 39, 37, 0, 267, 269, 270, 409, 287, 375, 321, 405, 314, 17, 84, 181, 91, 146, 57]
         outerLips = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291, 375, 321, 405, 314, 17, 84, 181, 91, 146, 61]
         innerLips = [62, 78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95, 78,
                      62]
         coodinates = np.array(coodinates).reshape((-1, 1, 2))
+        overlay = img.copy()
         try:
             lipsCoodinates = np.array([coodinates[l] for l in outerLips + innerLips]).reshape(-1, 1, 2)
             outerLipsCoodinates = np.array([coodinates[l] for l in outerLips]).reshape(-1, 1, 2)
             innerLipsCoodinates = np.array([coodinates[l] for l in innerLips]).reshape(-1, 1, 2)
             cv2.fillPoly(img, [lipsCoodinates], color)
 
-            cv2.polylines(img, [outerLipsCoodinates], True, self.outlineColor, thickness)
-            cv2.polylines(img, [innerLipsCoodinates], True, innerColor, thickness)
+            cv2.polylines(img, [outerLipsCoodinates], True, outerLineColor, thickness)
+            cv2.polylines(img, [innerLipsCoodinates], True, innerLineColor, thickness)
+            overlay = cv2.addWeighted(overlay,1-alpha,img,alpha, 0)
+            return overlay
         except:
-            print("Lips Not found Error")
+            return img
 
     def drawTika(self, img, coodinates, color=(0, 0, 255)):
         path = [10, 108, 107, 9, 336, 337, 10]
@@ -251,13 +255,17 @@ with mp_face_mesh.FaceMesh(
         else:
             sf.outlineColor = (0, 0, 0)
 
+
         borderTool.setImage(image)
         maskTool.setImage(image)
         patchTool.setImage(image)
         colorTool.setImage(image)
 
+        lipscolor = (0,0,255)
+        image = sf.drawLips(image,coodinates=landmarks,alpha=0.15,color=lipscolor,innerLineColor=lipscolor,outerLineColor=lipscolor)
+
         # Flip the image horizontally for a selfie-view display.
-        cv2.imshow('MediaPipe Face Mesh', cv2.flip(image, 1))
+        cv2.imshow('SnapChatFilter', cv2.flip(image, 1))
 
         if cv2.waitKey(30) & 0xFF == ord('q'):
             break

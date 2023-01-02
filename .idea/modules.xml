@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Drag and Drop opencv.iml" filepath="$PROJECT_DIR$/.idea/Drag and Drop opencv.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../whiteboard/.idea/whiteboard.iml" filepath="$PROJECT_DIR$/../whiteboard/.idea/whiteboard.iml" />
     </modules>
   </component>
 </project>

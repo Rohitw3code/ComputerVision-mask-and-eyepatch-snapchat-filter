@@ -1,7 +1,8 @@
-import cv2
-import mediapipe as mp
 import math
 import random as rd
+
+import cv2
+import mediapipe as mp
 import numpy as np
 from cvzone.HandTrackingModule import HandDetector
 
@@ -22,7 +23,7 @@ class Tool():
         self.selected = False
         self.desired_size_x = 40
         self.desired_size_y = 40
-        self.ccode = [(249, 207, 136),(0,0,0), (249, 248, 212), (100, 100, 100), (166, 142, 232), (146, 175, 224)]
+        self.ccode = [(249, 207, 136), (0, 0, 0), (249, 248, 212), (100, 100, 100), (166, 142, 232), (146, 175, 224)]
         # self.desired_size_x, self.desired_size_y = self.toolImage.shape[:2]
 
     def setImage(self, img, border=True):
@@ -58,11 +59,11 @@ class Tool():
         return self.selected, rd.choice(self.ccode)
 
 
-mask = cv2.imread("mask.png")
-patch = cv2.imread("patch.png")
-filled = cv2.imread("with_outline.png")
-wborder = cv2.imread("without_outline.png")
-colorChanger = cv2.imread("color.png")
+mask = cv2.imread("icons/mask.png")
+patch = cv2.imread("icons/patch.png")
+filled = cv2.imread("icons/with_outline.png")
+wborder = cv2.imread("icons/without_outline.png")
+colorChanger = cv2.imread("icons/color.png")
 
 size = 40
 margin = 3
@@ -88,7 +89,8 @@ class SnapFilter():
         self.maskColor = maskcolor
         self.eyePatchColor = eyePatchColor
 
-    def drawLips(self, img, coodinates, thickness=1, color=(0, 0, 255), innerLineColor=(0, 0, 0),outerLineColor=(0,0,0),alpha = 0.4):
+    def drawLips(self, img, coodinates, thickness=1, color=(0, 0, 255), innerLineColor=(0, 0, 0),
+                 outerLineColor=(0, 0, 0), alpha=0.4):
         outerLips = [57, 185, 40, 39, 37, 0, 267, 269, 270, 409, 287, 375, 321, 405, 314, 17, 84, 181, 91, 146, 57]
         outerLips = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291, 375, 321, 405, 314, 17, 84, 181, 91, 146, 61]
         innerLips = [62, 78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95, 78,
@@ -103,7 +105,7 @@ class SnapFilter():
 
             cv2.polylines(img, [outerLipsCoodinates], True, outerLineColor, thickness)
             cv2.polylines(img, [innerLipsCoodinates], True, innerLineColor, thickness)
-            overlay = cv2.addWeighted(overlay,1-alpha,img,alpha, 0)
+            overlay = cv2.addWeighted(overlay, 1 - alpha, img, alpha, 0)
             return overlay
         except:
             return img
@@ -190,9 +192,14 @@ DRAW_EYE_PATCH = False
 DRAW_MASK = False
 OUTLINE = False
 
+width = 1050
+height = 1000
+
 # For webcam input:
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 cap = cv2.VideoCapture(0)
+cap.set(3, width)
+cap.set(4, height)
 with mp_face_mesh.FaceMesh(
         max_num_faces=1,
         refine_landmarks=True,
@@ -255,14 +262,14 @@ with mp_face_mesh.FaceMesh(
         else:
             sf.outlineColor = (0, 0, 0)
 
-
         borderTool.setImage(image)
         maskTool.setImage(image)
         patchTool.setImage(image)
         colorTool.setImage(image)
 
-        lipscolor = (0,0,255)
-        image = sf.drawLips(image,coodinates=landmarks,alpha=0.15,color=lipscolor,innerLineColor=lipscolor,outerLineColor=lipscolor)
+        # lipscolor = (0, 0, 255)
+        # image = sf.drawLips(image, coodinates=landmarks, alpha=0.2, color=lipscolor, innerLineColor=lipscolor,
+        #                     outerLineColor=lipscolor)
 
         # Flip the image horizontally for a selfie-view display.
         cv2.imshow('SnapChatFilter', cv2.flip(image, 1))
